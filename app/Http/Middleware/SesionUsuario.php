@@ -21,15 +21,9 @@ class SesionUsuario
         {
 
             $user = Auth::user();
-            //$users = DB::table('users')->where('user_id', $user->user_id)->get();
-            //Session::put('rol', $users);
-
             return $next($request);
         }
-        else
-        {
-            redirect('/login');
-        }
 
+        return $next($request);
     }
 }

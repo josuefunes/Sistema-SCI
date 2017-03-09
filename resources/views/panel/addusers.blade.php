@@ -67,6 +67,12 @@
                                     <h4><strong>Error al crear usuario. Verificar log</strong></h4>
                                 </span>
                             </div>
+                        @elseif (Session::has('statusduplicado'))
+                            <div class="panel-danger" style="text-align: center">
+                                <span class="alert-danger">
+                                    <h4><strong>Ya existe un usuario registrado con el mismo nombre de usuario o correo electr&oacute;nico</strong></h4>
+                                </span>
+                            </div>
                         @endif
                     </div>
                 </div>

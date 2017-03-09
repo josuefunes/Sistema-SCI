@@ -24,8 +24,9 @@ Auth::routes();
 
 Route::get('/inicio', 'HomeController@index');
 Route::get('/panel', 'PanelController@index');
+Route::get('/403', 'ForbiddenViewController@index');
 Route::get('/panel/agregarUsuario', 'AddUserController@index');
 Route::get('/panel/administrarUsuarios', 'ManageUsers@index');
-Route::get('/panel/editarUsuario', 'EditarUsuario@index');
 Route::post('/panel/agregarUsuario', array('as' => '/panel/agregarUsuario', 'uses' => 'AddUserController@agregarUsuario'));
-
+Route::post('/panel/administrarUsuarios/cambiarPassword', array('as' => 'panel/administrarUsuarios/cambiarPassword', 'uses' => 'ManageUsers@cambiarPassword'));
+Route::post('/panel/administrarUsuarios/borrarUsuario', array('as' => 'panel/administrarUsuarios/borrarUsuario', 'uses' => 'ManageUsers@borrarUsuario'));

@@ -65,7 +65,40 @@
                 }
                 else if($(this).attr('type')=='borrarUsuario')
                 {
-                    alert("Borrando a " + username)
+
+                    parametros = {
+                        "username" : username,
+                        "_token" : $('meta[name="csrf-token"]').attr('content')
+                    };
+
+                    $.ajax({
+                        url: '/panel/administrarUsuarios/borrarUsuario',
+                        data: parametros,
+                        dataType: 'json',
+                        method: 'post',
+                        timeout: 5000,
+                        
+                        success: function(data)
+                        {
+                            if(data.status=='OK')
+                            {
+                                alert('Usuario borrado exitosamente');
+                            }
+                            else
+                            {
+                                alert('Ocurrio un error al intentar borrar el usuario');
+                            }
+                        },
+                        
+                        error : function (x,t,m) {
+                            if(t=="timeout")
+                            {
+                                alert("Ocurrio un timeout en funcion Ajax");
+                            }
+                        }
+                    });
+
+                    window.location.reload();
                 }
             });
 

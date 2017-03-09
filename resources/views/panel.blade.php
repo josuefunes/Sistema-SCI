@@ -16,10 +16,6 @@
                                     <label class="control-label">Agregar Usuario</label>
                                 </td>
                                 <td style="padding: 10px;">
-                                    <a href="/panel/editarUsuario"><img src="img/edit-user.png" style="width: 100px; height: auto;"></a><br>
-                                    <label class="control-label">Editar Usuario</label>
-                                </td>
-                                <td style="padding: 10px;">
                                     <a href="/panel/administrarUsuarios"><img src="img/manage-users.png" style="width: 100px; height: auto;"></a><br>
                                     <label class="control-label">Administrar Usuarios</label>
                                 </td>
