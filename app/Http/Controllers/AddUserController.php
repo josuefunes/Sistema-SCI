@@ -72,7 +72,6 @@ class AddUserController extends Controller
                 {
                     if($qex->getCode()==23000)
                     {
-                        error_log("Duplicado");
                         return redirect('/panel/agregarUsuario')->with('statusduplicado', 'DUPLICADO');
                     }
                 }

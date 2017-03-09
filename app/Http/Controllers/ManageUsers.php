@@ -42,8 +42,23 @@ class ManageUsers extends Controller
     {
         if(Auth::check())
         {
-            if (Auth::user()->rol <= $this->nivel_minimo) {
+            if (Auth::user()->rol <= $this->nivel_minimo)
+            {
+                $password = bcrypt($request->input('password'));
+                $actualizado = User::where('username', $request->input('username'))->update(['password' => $password]);
 
+                if($actualizado)
+                {
+                    return response()->json([
+                        'status' => 'OK'
+                    ]);
+                }
+                else
+                {
+                    return response()->json([
+                        'status' => 'ERROR'
+                    ]);
+                }
             }
             else
             {
@@ -80,6 +95,7 @@ class ManageUsers extends Controller
         {
             if (Auth::user()->rol <= $this->nivel_minimo)
             {
+
                 $borrado = User::where('username', $request->input('username'))->delete();
                 if($borrado)
                 {

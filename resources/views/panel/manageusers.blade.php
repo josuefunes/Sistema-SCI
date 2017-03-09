@@ -31,7 +31,7 @@
                         {{ $users->links() }}
                     </div>
 
-                    <div class="modal fade" id="modal-borrar">
+                    <div class="modal fade" id="modal-borrar" tabindex="-1" role="dialog" aria-labelledby="borrarModalLabel">
                         <div class="modal-dialog" role="document">
                             <div class="modal-content">
                                 <div class="modal-header">
@@ -39,6 +39,50 @@
                                             data-dismiss="modal"
                                             aria-label="Close">
                                             <span aria-hidden="true">&times;</span></button>
+                                    <h4 class="modal-title" id="borrarModalLabel">Borrar Usuario</h4>
+                                </div>
+                                <div class="modal-body">
+                                    <p>Desea borrar al usuario : <strong><label id="labelusuario">?</label></strong></p>
+                                    <br>
+                                    <span id="borrarspan" class="hidden alert-success">
+                                        <h4><strong>Usuario borrado exitosamente</strong> </h4>
+                                    </span>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                                    <button id="btnborrar" type="button" class="btn btn-danger">Borrar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal fade" id="modal-password" tabindex="-1" role="dialog" aria-labelledby="passwordModalLabel">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close"
+                                            data-dismiss="modal"
+                                            aria-label="Close">
+                                        <span aria-hidden="true">&times;</span></button>
+                                    <h4 class="modal-title" id="passwordModalLabel">Cambiar Password</h4>
+                                </div>
+                                <div class="modal-body">
+                                    <p>Cambiando contrase&ntilde;a a usuario : <strong><label id="labelpassword">?</label></strong></p>
+                                    <form id="form-cambiarpsk" class="form-horizontal" action="POST">
+                                        <div class="form-group">
+                                            <label for="password" class="col-md-4 control-label">Nuve Contrase&ntilde;a</label>
+                                            <div class="col-md-6">
+                                                <input class="form-control" id="password" name="password" type="password" required>
+                                            </div>
+                                            <span id="passwordspan" class="hidden alert-success">
+                                                <h4><strong>Cambio realizado exitosamente</strong> </h4>
+                                            </span>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                                    <button id="btnpassword" type="button" class="btn btn-danger">Cambiar Contrase&ntilde;a</button>
                                 </div>
                             </div>
                         </div>
@@ -53,54 +97,112 @@
 
         $(document).ready(function () {
 
+            $("#btnpassword").click(function () {
+                cambiarPassword($("#labelpassword").html());
+            });
+
+            $("#btnborrar").click(function () {
+                borrarUsuario($("#labelusuario").html());
+            });
+
             $("a").click(function () {
                 username = $(this).closest('tr').attr('id');
                 if($(this).attr('type')=='editarUsuario')
                 {
-                    alert("Editando a " + username);
+                    $("#modal-editar").modal();
                 }
                 else if($(this).attr('type')=='cambioPassword')
                 {
-                    alert("Cambiando password a " + username);
+                    $("#labelpassword").html(username);
+                    $("#modal-password").modal();
                 }
                 else if($(this).attr('type')=='borrarUsuario')
                 {
-
-                    parametros = {
-                        "username" : username,
-                        "_token" : $('meta[name="csrf-token"]').attr('content')
-                    };
-
-                    $.ajax({
-                        url: '/panel/administrarUsuarios/borrarUsuario',
-                        data: parametros,
-                        dataType: 'json',
-                        method: 'post',
-                        timeout: 5000,
-                        
-                        success: function(data)
-                        {
-                            if(data.status=='OK')
-                            {
-                                alert('Usuario borrado exitosamente');
-                            }
-                            else
-                            {
-                                alert('Ocurrio un error al intentar borrar el usuario');
-                            }
-                        },
-                        
-                        error : function (x,t,m) {
-                            if(t=="timeout")
-                            {
-                                alert("Ocurrio un timeout en funcion Ajax");
-                            }
-                        }
-                    });
-
-                    window.location.reload();
+                    $("#labelusuario").html(username);
+                    $("#modal-borrar").modal();
                 }
             });
+
+            function cambiarPassword(username)
+            {
+                $("#btnpassword").attr('disabled', 'disable');
+
+                parametros = {
+                    "username" : username,
+                    "_token" : $('meta[name="csrf-token"]').attr('content')
+                };
+
+                $.ajax({
+                    url: '/panel/administrarUsuarios/cambiarPassword',
+                    data: parametros,
+                    dataType: 'json',
+                    method: 'post',
+                    timeout: 5000,
+
+                    success: function(data)
+                    {
+                        if(data.status=='OK')
+                        {
+                            $("#passwordspan").removeClass('hidden');
+                            setTimeout(function() { $("#modal-password").modal('hide') }, 3000);
+                            setTimeout(function() { window.location.reload(true) } ,3500);
+                        }
+                        else
+                        {
+                            alert('Ocurrio un error al intentar cambiar el password');
+                        }
+                    },
+
+                    error: function (x,t,m) {
+                        if(t=="timeout")
+                        {
+                            alert("Ocurrio un timeout en funcion Ajax");
+                        }
+                    }
+                });
+            }
+
+            function borrarUsuario(username)
+            {
+
+                $("#btnborrar").attr('disabled', 'disable');
+
+                parametros = {
+                    "username" : username,
+                    "_token" : $('meta[name="csrf-token"]').attr('content')
+                };
+
+                $.ajax({
+                    url: '/panel/administrarUsuarios/borrarUsuario',
+                    data: parametros,
+                    dataType: 'json',
+                    method: 'post',
+                    timeout: 5000,
+
+                    success: function(data)
+                    {
+                        if(data.status=='OK')
+                        {
+                            $("#borrarspan").removeClass('hidden');
+                            setTimeout(function() { $("#modal-borrar").modal('hide') }, 3000);
+                            setTimeout(function() { window.location.reload(true) } ,3500);
+                        }
+                        else
+                        {
+                            alert('Ocurrio un error al intentar borrar el usuario');
+                        }
+                    },
+
+                    error: function (x,t,m) {
+                        if(t=="timeout")
+                        {
+                            alert("Ocurrio un timeout en funcion Ajax");
+                        }
+                    }
+                });
+
+
+            }
 
         });
 
