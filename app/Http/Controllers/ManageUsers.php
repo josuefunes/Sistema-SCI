@@ -24,7 +24,8 @@ class ManageUsers extends Controller
             if (Auth::user()->rol <= $this->nivel_minimo)
             {
                 $users = DB::table('users')->where('unremovable', 0)->simplePaginate(5);
-                return view('panel.manageusers')->with('users', $users);
+                $roles = DB::table('roles')->get();
+                return view('panel.manageusers')->with('users', $users)->with('roles', $roles);
             }
             else
             {
@@ -57,6 +58,41 @@ class ManageUsers extends Controller
                 {
                     return response()->json([
                         'status' => 'ERROR'
+                    ]);
+                }
+            }
+            else
+            {
+                abort(-1, "Permiso no otorgado");
+            }
+        }
+        else
+        {
+            abort(-1, "Permiso no otorgado");
+        }
+    }
+
+    public function getUserData(Request $request)
+    {
+        if(Auth::check())
+        {
+            if (Auth::user()->rol <= $this->nivel_minimo)
+            {
+                $usuario = User::where('username', $request->input('username'));
+
+                if($usuario)
+                {
+                    return response()->json([
+                       'name' => $usuario->name,
+                        'email' => $usuario->email,
+                        'rol' => $usuario->rol,
+                        'status' => 'OK'
+                    ]);
+                }
+                else
+                {
+                    return response()->json([
+                       'status' => 'ERROR'
                     ]);
                 }
             }

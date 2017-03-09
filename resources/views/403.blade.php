@@ -21,7 +21,7 @@
 
        $(document).ready(function () {
 
-           setTimeout(window.history.back, 5000);
+           setTimeout(function(){ window.history.back() }, 5000);
 
        });
 

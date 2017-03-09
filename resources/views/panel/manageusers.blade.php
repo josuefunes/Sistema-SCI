@@ -42,15 +42,69 @@
                                     <h4 class="modal-title" id="borrarModalLabel">Borrar Usuario</h4>
                                 </div>
                                 <div class="modal-body">
-                                    <p>Desea borrar al usuario : <strong><label id="labelusuario">?</label></strong></p>
-                                    <br>
-                                    <span id="borrarspan" class="hidden alert-success">
-                                        <h4><strong>Usuario borrado exitosamente</strong> </h4>
+                                    <div class="form-group">
+                                        <p>Desea borrar al usuario : <strong><label id="labelusuario">?</label></strong></p>
+                                    </div>
+                                    <div class="form-group" style="text-align: center">
+                                        <span id="borrarspan" class="hidden alert-success">
+                                        <strong>Usuario borrado exitosamente</strong>
                                     </span>
+                                    </div>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
                                     <button id="btnborrar" type="button" class="btn btn-danger">Borrar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal fade" id="modal-editar" tabindex="-1" role="dialog" aria-labelledby="editarModalLabel">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close"
+                                            data-dismiss="modal"
+                                            aria-label="Close">
+                                        <span aria-hidden="true">&times;</span></button>
+                                    <h4 class="modal-title" id="editarModalLabel">Editar Usuario</h4>
+                                </div>
+                                <div class="modal-body">
+                                    <p>Editando usuario : <strong><label id="nombreusuario">?</label></strong></p>
+                                    <form id="form-editarUsuario" class="form-horizontal" action="POST">
+                                        <div class="form-group">
+                                            <label for="usuario" class="col-md-4 control-label">Usuario</label>
+                                            <div class="col-md-6">
+                                                <input class="form-control" id="usuario" name="usuario" type="text" readonly>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="name" class="col-md-4 control-label">Nombre Completo</label>
+                                            <div class="col-md-6">
+                                                <input class="form-control" id="name" name="name" type="text" required value="">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="name" class="col-md-4 control-label">Correo electr&oacute;nico</label>
+                                            <div class="col-md-6">
+                                                <input class="form-control" id="email" name="email" type="text">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="name" class="col-md-4 control-label">Cambiar Rol</label>
+                                            <div class="col-md-6">
+                                                <select id="rol" class="form-control" name="rol">
+                                                    @foreach($roles as $rol)
+                                                        <option value="{{ $rol->idRol }}">{{ $rol->nombreRol }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                                    <button id="btneditar" type="button" class="btn btn-danger">Guardar Cambios</button>
                                 </div>
                             </div>
                         </div>
@@ -70,12 +124,14 @@
                                     <p>Cambiando contrase&ntilde;a a usuario : <strong><label id="labelpassword">?</label></strong></p>
                                     <form id="form-cambiarpsk" class="form-horizontal" action="POST">
                                         <div class="form-group">
-                                            <label for="password" class="col-md-4 control-label">Nuve Contrase&ntilde;a</label>
+                                            <label for="password" class="col-md-4 control-label">Nueva Contrase&ntilde;a</label>
                                             <div class="col-md-6">
                                                 <input class="form-control" id="password" name="password" type="password" required>
                                             </div>
+                                        </div>
+                                        <div class="form-group" style="text-align: center">
                                             <span id="passwordspan" class="hidden alert-success">
-                                                <h4><strong>Cambio realizado exitosamente</strong> </h4>
+                                                <strong>Cambio realizado exitosamente</strong>
                                             </span>
                                         </div>
                                     </form>
@@ -109,6 +165,9 @@
                 username = $(this).closest('tr').attr('id');
                 if($(this).attr('type')=='editarUsuario')
                 {
+                    getUserData(username);
+                    $("#nombreusuario").html(username);
+                    $("#usuario").val(username);
                     $("#modal-editar").modal();
                 }
                 else if($(this).attr('type')=='cambioPassword')
@@ -123,12 +182,44 @@
                 }
             });
 
+            function getUserData(username) {
+
+                parametros = {
+                    "username" : username,
+                    "_token" : $('meta[name="csrf-token"]').attr('content')
+                };
+
+                $.ajax({
+                    url: '/panel/administrarUsuarios/getUserData',
+                    data: parametros,
+                    dataType: 'json',
+                    method: 'post',
+                    timeout: 5000,
+
+                    success: function(data)
+                    {
+                        $("#name").val(data.name);
+                        $("#email").val(data.email);
+                        $("#rol").selectedIndex = data.rol;
+                    },
+                    error: function(x,t,m)
+                    {
+                        if(t=="timeout")
+                        {
+                            alert("Ocurrio un timeout en funcion Ajax");
+                        }
+                    }
+
+                });
+            }
+
             function cambiarPassword(username)
             {
                 $("#btnpassword").attr('disabled', 'disable');
 
                 parametros = {
                     "username" : username,
+                    "password" : $("#password").val(),
                     "_token" : $('meta[name="csrf-token"]').attr('content')
                 };
 
