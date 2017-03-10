@@ -19,6 +19,7 @@
             'csrfToken' => csrf_token(),
         ]) !!};
     </script>
+    <script type="text/javascript" src="../js/jquery-3.1.1.min.js"></script>
 </head>
 <body>
     <div id="app">
@@ -60,12 +61,12 @@
 
                                 <ul class="dropdown-menu" role="menu">
                                     <li>
+                                        <a href="#" id="changePassword">Cambiar Contrase&ntilde;a</a>
                                         <a href="{{ route('logout') }}"
                                             onclick="event.preventDefault();
                                                      document.getElementById('logout-form').submit();">
                                             Cerrar Sesi&oacute;n
                                         </a>
-
                                         <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
                                             {{ csrf_field() }}
                                         </form>
@@ -81,7 +82,94 @@
         @yield('content')
     </div>
 
+
+    <div class="modal fade" id="modal-password-home" tabindex="-1" role="dialog" aria-labelledby="passwordModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal"
+                            aria-label="Close">
+                        <span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="passwordModalLabel">Cambiar Contrase&ntilde;a</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Cambio de contrase&ntilde;a para tu usuario</strong></p>
+                    <form id="form-iniciopsk" class="form-horizontal" onkeypress="return event.keyCode != 13;">
+                        <div class="form-group">
+                            <label for="inicio-password" class="col-md-4 control-label">Nueva Contrase&ntilde;a</label>
+                            <div class="col-md-6">
+                                <input class="form-control" id="inicio-password" name="inicio-password" type="password" required>
+                            </div>
+                        </div>
+                        <div class="form-group" style="text-align: center">
+                            <span id="iniciopasswordspan" class="hidden alert-success">
+                                <strong>Cambio realizado exitosamente</strong>
+                            </span>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                    <button id="btnpasswordinicio" type="button" class="btn btn-danger">Cambiar Contrase&ntilde;a</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <!-- Scripts -->
     <script src="{{ asset('js/app.js') }}"></script>
+    <script type="text/javascript">
+
+        $("#form-iniciopsk").submit(function () {
+           event.preventDefault();
+        });
+
+        $("#btnpasswordinicio").click(function () {
+
+            event.preventDefault();
+
+            parametros = {
+                "password" : $("#inicio-password").val(),
+                "_token" : $('meta[name="csrf-token"]').attr('content')
+            };
+
+            $.ajax({
+                url: '/inicio/cambiarPassword',
+                data: parametros,
+                dataType: 'json',
+                method: 'post',
+                timeout: 5000,
+
+                success: function(data)
+                {
+                    if(data.status=='OK')
+                    {
+                        $("#iniciopasswordspan").removeClass('hidden');
+                        setTimeout(function() { $("#modal-password-home").modal('hide') }, 2000);
+                        $("#inicio-password").val('');
+                    }
+                    else
+                    {
+                        alert('Ocurrio un error al intentar cambiar el password');
+                    }
+                },
+
+                error: function (x,t,m) {
+                    if(t=="timeout")
+                    {
+                        alert("Ocurrio un timeout en funcion Ajax");
+                    }
+                }
+            });
+
+        });
+
+        $("#changePassword").click(function () {
+            $("#modal-password-home").modal();
+            $("#iniciopasswordspan").addClass('hidden');
+        });
+    </script>
 </body>
 </html>

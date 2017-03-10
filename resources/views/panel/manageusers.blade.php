@@ -75,7 +75,7 @@
                                 </div>
                                 <div class="modal-body">
                                     <p>Editando usuario : <strong><label id="nombreusuario">?</label></strong></p>
-                                    <form id="form-editarUsuario" class="form-horizontal" action="POST">
+                                    <form id="form-editarUsuario" class="form-horizontal" onkeypress="return event.keyCode != 13;">
                                         <div class="form-group">
                                             <label for="usuario" class="col-md-4 control-label">Usuario</label>
                                             <div class="col-md-6">
@@ -131,7 +131,7 @@
                                 </div>
                                 <div class="modal-body">
                                     <p>Cambiando contrase&ntilde;a a usuario : <strong><label id="labelpassword">?</label></strong></p>
-                                    <form id="form-cambiarpsk" class="form-horizontal" action="POST">
+                                    <form id="form-cambiarpsk" class="form-horizontal" onkeypress="return event.keyCode != 13;">
                                         <div class="form-group">
                                             <label for="password" class="col-md-4 control-label">Nueva Contrase&ntilde;a</label>
                                             <div class="col-md-6">
@@ -157,7 +157,6 @@
             </div>
         </div>
     </div>
-    <script type="text/javascript" src="../js/jquery-3.1.1.min.js"></script>
     <script type="text/javascript">
 
         $(document).ready(function () {
@@ -182,16 +181,19 @@
                     $("#nombreusuario").html(username);
                     $("#usuario").val(username);
                     $("#modal-editar").modal();
+                    $("#editarspan").addClass('hidden');
                 }
                 else if($(this).attr('type')=='cambioPassword')
                 {
                     $("#labelpassword").html(username);
                     $("#modal-password").modal();
+                    $("#passwordspan").addClass('hidden');
                 }
                 else if($(this).attr('type')=='borrarUsuario')
                 {
                     $("#labelusuario").html(username);
                     $("#modal-borrar").modal();
+                    $("#borrarspan").addClass('hidden');
                 }
             });
 
@@ -298,6 +300,7 @@
                             $("#passwordspan").removeClass('hidden');
                             setTimeout(function() { $("#modal-password").modal('hide') }, 3000);
                             setTimeout(function() { window.location.reload(true) } ,3500);
+                            $("#password").val('');
                         }
                         else
                         {

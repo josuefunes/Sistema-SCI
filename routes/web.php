@@ -23,6 +23,7 @@ Route::get('/logout', function(){
 Auth::routes();
 
 Route::get('/inicio', 'HomeController@index');
+Route::post('/inicio/cambiarPassword', array('as' => '/inicio/cambiarPassword', 'uses' => 'HomeController@cambiarPassword'));
 Route::get('/panel', 'PanelController@index');
 Route::get('/inventario', 'InventarioHomeController@index');
 Route::get('/reportes', 'AuditoriaHomeController@index');
