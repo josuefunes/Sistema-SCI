@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use \App\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use League\Flysystem\Exception;
 
 class ManageUsers extends Controller
 {
@@ -23,7 +24,7 @@ class ManageUsers extends Controller
         {
             if (Auth::user()->rol <= $this->nivel_minimo)
             {
-                $users = DB::table('users')->where('unremovable', 0)->simplePaginate(5);
+                $users = DB::table('users')->join('roles', 'users.rol', 'roles.idRol')->where('unremovable', 0)->simplePaginate(5);
                 $roles = DB::table('roles')->get();
                 return view('panel.manageusers')->with('users', $users)->with('roles', $roles);
             }
@@ -74,12 +75,19 @@ class ManageUsers extends Controller
 
     public function getUserData(Request $request)
     {
+
         if(Auth::check())
         {
             if (Auth::user()->rol <= $this->nivel_minimo)
             {
-                $usuario = User::where('username', $request->input('username'));
-
+                try
+                {
+                    $usuario = User::where('username', $request->input('username'))->first();
+                }
+                catch (Exception $ex)
+                {
+                    error_log($ex->getMessage());
+                }
                 if($usuario)
                 {
                     return response()->json([
@@ -95,6 +103,7 @@ class ManageUsers extends Controller
                        'status' => 'ERROR'
                     ]);
                 }
+
             }
             else
             {
@@ -111,8 +120,22 @@ class ManageUsers extends Controller
     {
         if(Auth::check())
         {
-            if (Auth::user()->rol <= $this->nivel_minimo) {
+            if (Auth::user()->rol <= $this->nivel_minimo)
+            {
+                $actualizado = User::where('username', $request->input('username'))->update(['name' => $request->input('name'), 'email' => $request->input('email'), 'rol' => $request->input('rol')]);
 
+                if($actualizado)
+                {
+                    return response()->json([
+                        'status' => 'OK'
+                    ]);
+                }
+                else
+                {
+                    return response()->json([
+                        'status' => 'ERROR'
+                    ]);
+                }
             }
             else
             {

@@ -3,7 +3,7 @@
 @section('content')
     <div class="container">
         <div class="row">
-            <div class="col-md-8 col-md-offset-2">
+            <div class="col-md-10 col-md-offset-1">
                 <div class="panel panel-default">
                     <div class="panel-heading"><a href="/inicio">Inicio</a> >> <a href="/panel">Panel</a> >> Administrar Usuarios</div>
 
@@ -12,6 +12,8 @@
                             <tr>
                                 <th>Nombre Completo</th>
                                 <th>Nombre de Usuario</th>
+                                <th>E-Mail</th>
+                                <th>Rol</th>
                                 <th>Cambiar Contrase&ntilde;a</th>
                                 <th>Editar</th>
                                 <th>Eliminar</th>
@@ -21,6 +23,8 @@
                                 <tr id="{{ $user->username }}">
                                     <td>{{ $user->name }}</td>
                                     <td>{{ $user->username }}</td>
+                                    <td>{{ $user->email }}</td>
+                                    <td>{{ $user->nombreRol }}</td>
                                     <td style="text-align: center"><a href="#" type="cambioPassword"><img style="width: 30px; height: auto" src="../img/password.png"></a></td>
                                     <td style="text-align: center"><a href="#" type="editarUsuario"><img style="width: 30px; height: auto" src="../img/edit-user.png"></a></td>
                                     <td style="text-align: center"><a href="#" type="borrarUsuario"><img style="width: 30px; height: auto" src="../img/eliminar-usuario.png"></a></td>
@@ -100,6 +104,11 @@
                                                 </select>
                                             </div>
                                         </div>
+                                        <div class="form-group" style="text-align: center">
+                                            <span id="editarspan" class="hidden alert-success">
+                                                <strong>Usuario actualizado exitosamente</strong>
+                                            </span>
+                                        </div>
                                     </form>
                                 </div>
                                 <div class="modal-footer">
@@ -161,6 +170,10 @@
                 borrarUsuario($("#labelusuario").html());
             });
 
+            $("#btneditar").click(function () {
+               actualizarUsuario($("#usuario").val());
+            });
+
             $("a").click(function () {
                 username = $(this).closest('tr').attr('id');
                 if($(this).attr('type')=='editarUsuario')
@@ -198,9 +211,15 @@
 
                     success: function(data)
                     {
-                        $("#name").val(data.name);
-                        $("#email").val(data.email);
-                        $("#rol").selectedIndex = data.rol;
+                        if(data.status=='OK') {
+                            $("#name").val(data.name);
+                            $("#email").val(data.email);
+                            $("#rol").val(data.rol);
+                        }
+                        else if(data.status=='ERROR')
+                        {
+                            alert("Error en buscar info de usuario")
+                        }
                     },
                     error: function(x,t,m)
                     {
@@ -210,6 +229,48 @@
                         }
                     }
 
+                });
+            }
+
+            function actualizarUsuario(username)
+            {
+                $("#btneditar").attr('disabled', 'disable');
+
+                parametros = {
+                    "username" : username,
+                    "name" : $("#name").val(),
+                    "email" : $("#email").val(),
+                    "rol" : $("#rol").val(),
+                    "_token" : $('meta[name="csrf-token"]').attr('content')
+                };
+
+                $.ajax({
+                    url: '/panel/administrarUsuarios/actualizarUsuario',
+                    data: parametros,
+                    dataType: 'json',
+                    method: 'post',
+                    timeout: 5000,
+
+                    success: function(data)
+                    {
+                        if(data.status=='OK')
+                        {
+                            $("#editarspan").removeClass('hidden');
+                            setTimeout(function() { $("#modal-password").modal('hide') }, 3000);
+                            setTimeout(function() { window.location.reload(true) } ,3500);
+                        }
+                        else
+                        {
+                            alert('Ocurrio un error al intentar actualizar el usuario');
+                        }
+                    },
+
+                    error: function (x,t,m) {
+                        if(t=="timeout")
+                        {
+                            alert("Ocurrio un timeout en funcion Ajax");
+                        }
+                    }
                 });
             }
 
