@@ -31,7 +31,6 @@ class HomeController extends Controller
             {
                 $password = bcrypt($request->input('password'));
                 $username = Auth::user()->username;
-                error_log("usuario : " . $username);
                 $actualizado = User::where('username', $username)->update(['password' => $password]);
 
                 if($actualizado)
