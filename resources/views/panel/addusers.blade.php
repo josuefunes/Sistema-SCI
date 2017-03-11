@@ -40,9 +40,9 @@
                                 <label for="nivel" class="col-md-4 control-label">Nivel Administrativo</label>
                                 <div class="col-md-6">
                                     <select id="nivel" name="nivel" required class="form-control">
-                                        <option id="1" value="1">Administrador</option>
-                                        <option id="2" value="2">Operador</option>
-                                        <option id="3" value="3">Auditor</option>
+                                        @foreach($roles as $rol)
+                                            <option value="{{ $rol->idRol }}">{{ $rol->nombreRol }}</option>
+                                        @endforeach
                                     </select>
                                     <input type="hidden" id="rol" name="rol" value="1">
                                 </div>

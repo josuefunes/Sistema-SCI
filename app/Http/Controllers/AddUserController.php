@@ -7,6 +7,7 @@ Use Illuminate\Http\RedirectResponse;
 use App\User;
 use Illuminate\Support\Facades\Auth;
 use League\Flysystem\Exception;
+use Illuminate\Support\Facades\DB;
 
 class AddUserController extends Controller
 {
@@ -25,7 +26,8 @@ class AddUserController extends Controller
 
             if (Auth::check() <= $this->nivel_minimo) {
 
-                return view('panel.addusers');
+                $roles = DB::table('roles')->get();
+                return view('panel.addusers')->with('roles', $roles);
             }
             else
             {
